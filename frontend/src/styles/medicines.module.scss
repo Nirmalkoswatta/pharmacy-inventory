@@ -1,0 +1,331 @@
+@import '../styles/variables.scss';
+@import '../styles/mixins.scss';
+
+.medicines-container {
+  padding: $spacing-lg;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.medicines-header {
+  @include flexBetween;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-lg;
+  background: $bg-card;
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-lg;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $primary-color, $secondary-color);
+  }
+  
+  h1 {
+    color: $text-primary;
+    font-size: $font-size-xxxl;
+    font-weight: $font-weight-bold;
+    margin: 0;
+    position: relative;
+    
+    &::after {
+      content: '💊';
+      margin-left: $spacing-sm;
+      animation: bounce 2s infinite;
+    }
+  }
+}
+
+.add-medicine-btn {
+  @include buttonBase;
+  background: linear-gradient(135deg, $primary-color, lighten($primary-color, 10%));
+  color: $text-light;
+  font-weight: $font-weight-semibold;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-xl;
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.medicines-grid {
+  @include gridResponsive(3, $spacing-lg);
+  margin-bottom: $spacing-xl;
+  
+  &.stagger-animation {
+    > .medicine-card {
+      opacity: 0;
+      animation: slideInUp 0.6s ease-out forwards;
+      
+      &:nth-child(1) { animation-delay: 0.1s; }
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.3s; }
+      &:nth-child(4) { animation-delay: 0.4s; }
+      &:nth-child(5) { animation-delay: 0.5s; }
+      &:nth-child(6) { animation-delay: 0.6s; }
+    }
+  }
+}
+
+.medicine-card {
+  @include cardShadow;
+  padding: $spacing-lg;
+  transition: all $transition-normal;
+  position: relative;
+  overflow: hidden;
+  background: $bg-card;
+  border: 1px solid transparent;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+      $success-color 0%, 
+      $warning-color 50%, 
+      $error-color 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform $transition-normal;
+  }
+  
+  &:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: $shadow-xl;
+    border-color: rgba($primary-color, 0.3);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+    
+    .medicine-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.medicine-name {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+  @include truncateText;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: $primary-color;
+    transition: width $transition-normal;
+  }
+  
+  .medicine-card:hover &::after {
+    width: 100%;
+  }
+}
+
+.medicine-details {
+  margin-bottom: $spacing-md;
+  
+  .detail-item {
+    @include flexBetween;
+    margin-bottom: $spacing-xs;
+    padding: $spacing-xs 0;
+    border-bottom: 1px solid rgba($border-light, 0.5);
+    
+    .label {
+      font-weight: $font-weight-medium;
+      color: $text-secondary;
+      font-size: $font-size-sm;
+    }
+    
+    .value {
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+    }
+  }
+}
+
+.stock-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  position: relative;
+  
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  
+  &.high-stock {
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+    
+    &::before {
+      background: $success-color;
+    }
+  }
+  
+  &.medium-stock {
+    background: rgba($warning-color, 0.1);
+    color: $warning-color;
+    
+    &::before {
+      background: $warning-color;
+    }
+  }
+  
+  &.low-stock {
+    background: rgba($error-color, 0.1);
+    color: $error-color;
+    
+    &::before {
+      background: $error-color;
+      animation: pulse 1s infinite, shake 0.5s ease-in-out;
+    }
+  }
+}
+
+.medicine-actions {
+  @include flexBetween;
+  margin-top: $spacing-md;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all $transition-normal;
+  
+  .action-btn {
+    @include buttonBase;
+    padding: $spacing-sm;
+    border-radius: $border-radius-md;
+    font-size: $font-size-sm;
+    min-width: 80px;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s;
+    }
+    
+    &:active::before {
+      width: 100px;
+      height: 100px;
+    }
+    
+    &.edit-btn {
+      background: rgba($info-color, 0.1);
+      color: $info-color;
+      border: 1px solid rgba($info-color, 0.3);
+      
+      &:hover {
+        background: $info-color;
+        color: $text-light;
+        transform: scale(1.05);
+      }
+    }
+    
+    &.delete-btn {
+      background: rgba($error-color, 0.1);
+      color: $error-color;
+      border: 1px solid rgba($error-color, 0.3);
+      
+      &:hover {
+        background: $error-color;
+        color: $text-light;
+        transform: scale(1.05);
+        animation: shake 0.3s ease-in-out;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@include mobile {
+  .medicines-container {
+    padding: $spacing-md;
+  }
+  
+  .medicines-header {
+    flex-direction: column;
+    gap: $spacing-md;
+    text-align: center;
+    
+    h1 {
+      font-size: $font-size-xxl;
+    }
+  }
+  
+  .medicines-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+  
+  .medicine-card {
+    padding: $spacing-md;
+  }
+  
+  .medicine-actions {
+    opacity: 1;
+    transform: translateY(0);
+    flex-direction: column;
+    gap: $spacing-sm;
+    
+    .action-btn {
+      width: 100%;
+    }
+  }
+}
