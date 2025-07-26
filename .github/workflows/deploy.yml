@@ -54,14 +54,11 @@ jobs:
         run: |
           cd backend
           npm test
-        env:
-          MONGO_URI: mongodb://localhost:27017/pharmacy-test
-          NODE_ENV: test
 
       - name: Run frontend tests
         run: |
           cd frontend
-          npm test -- --coverage --watchAll=false
+          npm test -- --watchAll=false
 
       - name: Lint backend code
         run: |
