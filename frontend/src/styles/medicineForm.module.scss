@@ -1,0 +1,236 @@
+@import './variables.scss';
+@import './mixins.scss';
+
+.medicineForm {
+  padding: $spacing-lg;
+  background: $surface-color;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-md;
+
+  .sectionTitle {
+    color: $primary-color;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 2px solid $primary-color;
+
+    .sectionIcon {
+      color: $primary-color;
+    }
+  }
+
+  .sectionSubtitle {
+    color: $text-secondary;
+    font-weight: 500;
+    margin-bottom: $spacing-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .sectionIcon {
+      color: $accent-color;
+      font-size: 1.2rem;
+    }
+  }
+
+  .formField {
+    .MuiOutlinedInput-root {
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba($primary-color, 0.1);
+      }
+
+      &.Mui-focused {
+        box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+        
+        .MuiOutlinedInput-notchedOutline {
+          border-color: $primary-color;
+          border-width: 2px;
+        }
+      }
+    }
+
+    .MuiInputLabel-root {
+      &.Mui-focused {
+        color: $primary-color;
+      }
+    }
+
+    .MuiFormHelperText-root {
+      margin-left: 0;
+    }
+  }
+
+  .errorText {
+    margin-top: $spacing-xs;
+    margin-left: $spacing-sm;
+  }
+
+  .actionButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    padding-top: $spacing-lg;
+    border-top: 1px solid $border-color;
+    margin-top: $spacing-lg;
+
+    .cancelButton {
+      color: $text-secondary;
+      border-color: $border-color;
+      padding: $spacing-sm $spacing-lg;
+      min-width: 120px;
+
+      &:hover {
+        border-color: $error-color;
+        color: $error-color;
+        background-color: rgba($error-color, 0.04);
+      }
+    }
+
+    .saveButton {
+      background: linear-gradient(135deg, $primary-color, $accent-color);
+      color: white;
+      padding: $spacing-sm $spacing-lg;
+      min-width: 140px;
+      box-shadow: $shadow-sm;
+
+      &:hover {
+        background: linear-gradient(135deg, darken($primary-color, 10%), darken($accent-color, 10%));
+        box-shadow: $shadow-md;
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        background: $disabled-color;
+        color: $text-disabled;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: $spacing-md;
+
+    .actionButtons {
+      flex-direction: column;
+      gap: $spacing-sm;
+
+      .cancelButton,
+      .saveButton {
+        width: 100%;
+      }
+    }
+  }
+
+  // Form sections spacing
+  .MuiGrid-container {
+    .MuiGrid-item {
+      &:not(:last-child) {
+        margin-bottom: $spacing-xs;
+      }
+    }
+  }
+
+  // Input adornments styling
+  .MuiInputAdornment-root {
+    color: $text-secondary;
+
+    .MuiSvgIcon-root {
+      color: $accent-color;
+    }
+  }
+
+  // Select field styling
+  .MuiSelect-root {
+    .MuiSelect-select {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  // Date input styling
+  input[type="date"] {
+    color-scheme: light;
+    
+    &::-webkit-calendar-picker-indicator {
+      color: $accent-color;
+      cursor: pointer;
+    }
+  }
+
+  // Multiline text field styling
+  .MuiOutlinedInput-multiline {
+    padding: 0;
+
+    .MuiOutlinedInput-input {
+      padding: $spacing-sm;
+    }
+  }
+
+  // Focus ring for better accessibility
+  .MuiOutlinedInput-root {
+    &.Mui-focused {
+      outline: 2px solid rgba($primary-color, 0.2);
+      outline-offset: 2px;
+    }
+  }
+
+  // Error state styling
+  .Mui-error {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $error-color !important;
+    }
+
+    .MuiInputLabel-root {
+      color: $error-color !important;
+    }
+  }
+
+  // Success state (when field is valid and has content)
+  .MuiOutlinedInput-root:not(.Mui-error):not(.Mui-focused) {
+    &:has(input:valid:not(:placeholder-shown)) {
+      .MuiOutlinedInput-notchedOutline {
+        border-color: $success-color;
+      }
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+// Loading state animation
+.medicineForm {
+  &.loading {
+    .formField {
+      .MuiOutlinedInput-root {
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+}

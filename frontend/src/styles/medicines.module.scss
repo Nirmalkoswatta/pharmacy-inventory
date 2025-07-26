@@ -8,6 +8,24 @@
   animation: fadeIn 0.6s ease-out;
 }
 
+// Modern container for better card visibility
+.medicinesContainer {
+  padding: $spacing-lg;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+  
+  // Override any conflicting grid styles
+  .medicinesGrid {
+    // Remove any old grid styles that might conflict
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    gap: 24px !important;
+    padding: 20px 0 !important;
+    margin-bottom: 100px !important;
+  }
+}
+
 .medicines-header {
   @include flexBetween;
   margin-bottom: $spacing-xl;
@@ -326,6 +344,128 @@
     
     .action-btn {
       width: 100%;
+    }
+  }
+}
+
+// Dialog Styles
+.formDialog {
+  .MuiDialog-paper {
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-xl;
+    max-width: 900px;
+    width: 100%;
+    margin: $spacing-md;
+  }
+
+  .dialogTitle {
+    background: linear-gradient(135deg, $primary-color, $accent-color);
+    color: white;
+    padding: $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .dialogIcon {
+      font-size: 1.5rem;
+    }
+
+    .MuiTypography-root {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .dialogContent {
+    padding: $spacing-lg;
+    background: $surface-color;
+  }
+}
+
+.deleteDialog {
+  .MuiDialog-paper {
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-xl;
+    overflow: hidden;
+  }
+
+  .dialogTitle {
+    background: linear-gradient(135deg, $error-color, darken($error-color, 10%));
+    color: white;
+    padding: $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .dialogIcon {
+      font-size: 1.5rem;
+    }
+  }
+
+  .dialogContent {
+    padding: $spacing-lg;
+  }
+
+  .deleteConfirmation {
+    text-align: center;
+    padding: $spacing-md;
+
+    .warningIcon {
+      font-size: 3rem;
+      color: $warning-color;
+      margin-bottom: $spacing-md;
+    }
+
+    p {
+      margin: $spacing-sm 0;
+      color: $text-primary;
+
+      strong {
+        color: $error-color;
+      }
+    }
+
+    .warningText {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      font-style: italic;
+    }
+  }
+
+  .dialogActions {
+    padding: $spacing-lg;
+    background: $bg-light;
+    display: flex;
+    gap: $spacing-md;
+    justify-content: flex-end;
+  }
+
+  .cancelButton {
+    @include buttonBase;
+    background: transparent;
+    color: $text-secondary;
+    border: 1px solid $border-color;
+    padding: $spacing-sm $spacing-lg;
+
+    &:hover {
+      background: $bg-hover;
+      border-color: $text-secondary;
+    }
+  }
+
+  .confirmDeleteButton {
+    @include buttonBase;
+    background: linear-gradient(135deg, $error-color, darken($error-color, 10%));
+    color: white;
+    padding: $spacing-sm $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    &:hover {
+      background: linear-gradient(135deg, darken($error-color, 5%), darken($error-color, 15%));
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
     }
   }
 }
