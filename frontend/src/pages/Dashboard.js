@@ -16,7 +16,6 @@ import {
   Business,
   ShoppingCart,
   TrendingUp,
-  Inventory,
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -88,11 +87,6 @@ const Dashboard = () => {
     { name: 'Low Stock', value: stats?.lowStockMedicines || 0 },
     { name: 'Expired', value: stats?.expiredMedicines || 0 },
     { name: 'Expiring Soon', value: stats?.expiringSoonMedicines || 0 },
-  ];
-
-  const orderStatusData = [
-    { name: 'Total Orders', value: stats?.totalOrders || 0, color: '#1976d2' },
-    { name: 'Pending Orders', value: stats?.pendingOrders || 0, color: '#ff9800' },
   ];
 
   const COLORS = ['#1976d2', '#ff9800', '#f44336', '#ff5722'];

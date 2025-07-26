@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSpring, animated } from 'react-spring';
 import AOS from 'aos';
 import {
   Dialog,
@@ -10,11 +9,9 @@ import {
   DialogActions,
   Button,
   Typography,
-  Fade,
   Alert,
   Chip,
   Snackbar,
-  IconButton,
   Tooltip,
   Fab,
   Card,
