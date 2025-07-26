@@ -48,8 +48,8 @@ jobs:
       - name: Run backend tests
         run: |
           cd backend
-          npm install
-          npm test || echo "Backend tests failed but continuing build"
+          npm install supertest mongodb-memory-server --save-dev
+          npm test
         env:
           MONGO_URI: mongodb://localhost:27017/pharmacy-test
           NODE_ENV: test
@@ -57,7 +57,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd frontend
-          npm test -- --coverage --watchAll=false || echo "Frontend tests failed but continuing build"
+          CI=true npm test -- --coverage --watchAll=false --passWithNoTests
 
       - name: Build backend
         run: |

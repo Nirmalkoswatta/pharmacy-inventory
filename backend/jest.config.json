@@ -2,18 +2,22 @@
   "testEnvironment": "node",
   "testMatch": [
     "**/__tests__/**/*.js",
-    "**/?(*.)+(spec|test).js"
+    "**/*.test.js",
+    "**/*.spec.js"
   ],
   "collectCoverageFrom": [
     "**/*.js",
     "!**/node_modules/**",
     "!**/coverage/**",
-    "!jest.config.js"
+    "!jest.config.js",
+    "!index.js"
   ],
   "coverageDirectory": "coverage",
   "verbose": true,
   "forceExit": true,
   "clearMocks": true,
   "resetMocks": true,
-  "restoreMocks": true
+  "restoreMocks": true,
+  "detectOpenHandles": true,
+  "passWithNoTests": true
 }

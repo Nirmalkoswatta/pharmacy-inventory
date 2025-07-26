@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest"
+    "test": "jest --passWithNoTests --detectOpenHandles --forceExit"
   },
   "keywords": ["pharmacy", "inventory", "graphql", "nodejs"],
   "author": "Your Name",
