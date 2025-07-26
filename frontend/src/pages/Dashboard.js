@@ -146,7 +146,7 @@ const Dashboard = () => {
         <Grid item xs={12} sm={6}>
           <StatCard
             title="Total Revenue"
-            value={`₹${(stats?.totalRevenue || 0).toLocaleString()}`}
+            value={`$${(stats?.totalRevenue || 0).toLocaleString()}`}
             icon={<TrendingUp />}
             color="success"
           />
@@ -154,7 +154,7 @@ const Dashboard = () => {
         <Grid item xs={12} sm={6}>
           <StatCard
             title="Monthly Revenue"
-            value={`₹${(stats?.monthlyRevenue || 0).toLocaleString()}`}
+            value={`$${(stats?.monthlyRevenue || 0).toLocaleString()}`}
             icon={<TrendingUp />}
             color="primary"
           />
