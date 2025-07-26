@@ -70,33 +70,121 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = 'Medicine name is required';
-    if (!formData.manufacturer.trim()) newErrors.manufacturer = 'Manufacturer is required';
-    if (!formData.category) newErrors.category = 'Category is required';
-    if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required';
-    if (!formData.stockQuantity || parseInt(formData.stockQuantity) < 0) newErrors.stockQuantity = 'Valid stock quantity is required';
-    if (!formData.minStockLevel || parseInt(formData.minStockLevel) < 0) newErrors.minStockLevel = 'Valid minimum stock level is required';
-    if (!formData.maxStockLevel || parseInt(formData.maxStockLevel) <= 0) newErrors.maxStockLevel = 'Valid maximum stock level is required';
-    if (!formData.batchNumber.trim()) newErrors.batchNumber = 'Batch number is required';
-    if (!formData.expiryDate) newErrors.expiryDate = 'Expiry date is required';
-    if (!formData.supplierId) newErrors.supplierId = 'Supplier selection is required';
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Medicine name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Medicine name must be at least 2 characters';
+    }
 
-    // Additional validations
-    if (formData.minStockLevel && formData.maxStockLevel && 
-        parseInt(formData.minStockLevel) >= parseInt(formData.maxStockLevel)) {
+    // Manufacturer validation
+    if (!formData.manufacturer.trim()) {
+      newErrors.manufacturer = 'Manufacturer is required';
+    } else if (formData.manufacturer.length < 2) {
+      newErrors.manufacturer = 'Manufacturer name must be at least 2 characters';
+    }
+
+    // Category validation
+    if (!formData.category) newErrors.category = 'Category is required';
+
+    // Price validation with better formatting
+    const price = parseFloat(formData.price);
+    if (!formData.price || isNaN(price) || price <= 0) {
+      newErrors.price = 'Valid price is required (must be greater than $0)';
+    } else if (price > 10000) {
+      newErrors.price = 'Price cannot exceed $10,000';
+    }
+
+    // Stock quantity validation
+    const stockQty = parseInt(formData.stockQuantity);
+    if (!formData.stockQuantity || isNaN(stockQty) || stockQty < 0) {
+      newErrors.stockQuantity = 'Valid stock quantity is required (0 or greater)';
+    } else if (stockQty > 100000) {
+      newErrors.stockQuantity = 'Stock quantity cannot exceed 100,000 units';
+    }
+
+    // Min stock level validation
+    const minStock = parseInt(formData.minStockLevel);
+    if (!formData.minStockLevel || isNaN(minStock) || minStock < 0) {
+      newErrors.minStockLevel = 'Valid minimum stock level is required';
+    }
+
+    // Max stock level validation
+    const maxStock = parseInt(formData.maxStockLevel);
+    if (!formData.maxStockLevel || isNaN(maxStock) || maxStock <= 0) {
+      newErrors.maxStockLevel = 'Valid maximum stock level is required';
+    }
+
+    // Cross-field validations
+    if (!isNaN(minStock) && !isNaN(maxStock) && minStock >= maxStock) {
       newErrors.minStockLevel = 'Minimum stock must be less than maximum stock';
     }
 
-    if (formData.expiryDate && new Date(formData.expiryDate) <= new Date()) {
-      newErrors.expiryDate = 'Expiry date must be in the future';
+    if (!isNaN(stockQty) && !isNaN(maxStock) && stockQty > maxStock) {
+      newErrors.stockQuantity = 'Current stock cannot exceed maximum stock level';
     }
+
+    // Batch number validation
+    if (!formData.batchNumber.trim()) {
+      newErrors.batchNumber = 'Batch number is required';
+    } else if (!/^[A-Z0-9-]+$/i.test(formData.batchNumber)) {
+      newErrors.batchNumber = 'Batch number should contain only letters, numbers, and hyphens';
+    }
+
+    // Expiry date validation with better messaging
+    if (!formData.expiryDate) {
+      newErrors.expiryDate = 'Expiry date is required';
+    } else {
+      const expiryDate = new Date(formData.expiryDate);
+      const today = new Date();
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(today.getFullYear() + 10);
+      
+      if (expiryDate <= today) {
+        newErrors.expiryDate = 'Expiry date must be in the future';
+      } else if (expiryDate > oneYearFromNow) {
+        newErrors.expiryDate = 'Expiry date cannot be more than 10 years in the future';
+      }
+    }
+
+    // Supplier validation
+    if (!formData.supplierId) newErrors.supplierId = 'Supplier selection is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (field) => (event) => {
-    const value = event.target.value;
+    let value = event.target.value;
+    
+    // Apply specific formatting based on field type
+    switch (field) {
+      case 'price':
+        // Allow only numbers and decimal point, format to 2 decimal places on blur
+        value = value.replace(/[^0-9.]/g, '');
+        if (value.split('.').length > 2) {
+          value = value.substring(0, value.lastIndexOf('.'));
+        }
+        break;
+      case 'stockQuantity':
+      case 'minStockLevel':
+      case 'maxStockLevel':
+        // Allow only integers
+        value = value.replace(/[^0-9]/g, '');
+        break;
+      case 'batchNumber':
+        // Convert to uppercase and allow only alphanumeric and hyphens
+        value = value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+        break;
+      case 'name':
+      case 'manufacturer':
+        // Capitalize first letter of each word
+        value = value.replace(/\b\w/g, l => l.toUpperCase());
+        break;
+      default:
+        break;
+    }
+
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -107,6 +195,17 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
       setErrors(prev => ({
         ...prev,
         [field]: ''
+      }));
+    }
+  };
+
+  // Handle price formatting on blur
+  const handlePriceBlur = () => {
+    if (formData.price && !isNaN(formData.price)) {
+      const formattedPrice = parseFloat(formData.price).toFixed(2);
+      setFormData(prev => ({
+        ...prev,
+        price: formattedPrice
       }));
     }
   };
@@ -229,8 +328,12 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               value={formData.batchNumber}
               onChange={handleChange('batchNumber')}
               error={!!errors.batchNumber}
-              helperText={errors.batchNumber}
+              helperText={errors.batchNumber || 'e.g., BATCH-2024-001'}
               variant="outlined"
+              inputProps={{
+                maxLength: 20,
+                style: { textTransform: 'uppercase' }
+              }}
               className={styles.formField}
             />
           </Grid>
@@ -250,10 +353,15 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               type="number"
               value={formData.price}
               onChange={handleChange('price')}
+              onBlur={handlePriceBlur}
               error={!!errors.price}
-              helperText={errors.price}
+              helperText={errors.price || 'Enter price in USD'}
               variant="outlined"
-              inputProps={{ min: 0, step: 0.01 }}
+              inputProps={{ 
+                min: 0, 
+                step: 0.01,
+                max: 10000 
+              }}
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>
               }}
@@ -269,9 +377,12 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               value={formData.stockQuantity}
               onChange={handleChange('stockQuantity')}
               error={!!errors.stockQuantity}
-              helperText={errors.stockQuantity}
+              helperText={errors.stockQuantity || 'Current units in stock'}
               variant="outlined"
-              inputProps={{ min: 0 }}
+              inputProps={{ 
+                min: 0, 
+                max: 100000 
+              }}
               InputProps={{
                 startAdornment: <InputAdornment position="start"><InventoryIcon /></InputAdornment>
               }}
@@ -287,9 +398,12 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               value={formData.minStockLevel}
               onChange={handleChange('minStockLevel')}
               error={!!errors.minStockLevel}
-              helperText={errors.minStockLevel}
+              helperText={errors.minStockLevel || 'Alert when stock falls below this level'}
               variant="outlined"
-              inputProps={{ min: 0 }}
+              inputProps={{ 
+                min: 0,
+                max: parseInt(formData.maxStockLevel) - 1 || 99999
+              }}
               className={styles.formField}
             />
           </Grid>
@@ -302,9 +416,12 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               value={formData.maxStockLevel}
               onChange={handleChange('maxStockLevel')}
               error={!!errors.maxStockLevel}
-              helperText={errors.maxStockLevel}
+              helperText={errors.maxStockLevel || 'Maximum capacity for this medicine'}
               variant="outlined"
-              inputProps={{ min: 1 }}
+              inputProps={{ 
+                min: parseInt(formData.minStockLevel) + 1 || 1,
+                max: 100000
+              }}
               className={styles.formField}
             />
           </Grid>
@@ -324,9 +441,13 @@ const MedicineForm = ({ medicine, onSubmit, onCancel }) => {
               value={formData.expiryDate}
               onChange={handleChange('expiryDate')}
               error={!!errors.expiryDate}
-              helperText={errors.expiryDate}
+              helperText={errors.expiryDate || 'Medicine expiration date'}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
+              inputProps={{
+                min: new Date().toISOString().split('T')[0], // Today as minimum
+                max: new Date(new Date().setFullYear(new Date().getFullYear() + 10)).toISOString().split('T')[0] // 10 years max
+              }}
               className={styles.formField}
             />
           </Grid>
