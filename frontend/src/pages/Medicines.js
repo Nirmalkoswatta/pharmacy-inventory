@@ -3,7 +3,6 @@ import { useQuery, useMutation } from '@apollo/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
 import AOS from 'aos';
-import { toast } from 'react-toastify';
 import {
   Dialog,
   DialogTitle,
@@ -33,7 +32,8 @@ import {
   StarBorder as StarBorderIcon,
   LocalPharmacy as PharmacyIcon
 } from '@mui/icons-material';
-import { GET_MEDICINES, DELETE_MEDICINE } from '../graphql/queries';
+import { GET_MEDICINES } from '../graphql/queries';
+import { DELETE_MEDICINE } from '../graphql/mutations';
 import styles from '../styles/medicines.module.scss';
 import 'aos/dist/aos.css';
 
