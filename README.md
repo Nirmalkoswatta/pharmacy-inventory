@@ -12,6 +12,7 @@ A modern, full-stack **DevOps-based Inventory Management System** specifically d
 ## ✨ Features
 
 ### 🏥 Core Functionality
+
 - **Medicine Management**: Complete CRUD operations for pharmaceutical inventory
 - **Real-time Stock Tracking**: Live inventory monitoring with low-stock alerts
 - **Supplier Management**: Comprehensive supplier database and relationship tracking
@@ -20,6 +21,7 @@ A modern, full-stack **DevOps-based Inventory Management System** specifically d
 - **Stock Analytics**: Visual dashboards with charts and insights
 
 ### 🎨 Modern UI/UX
+
 - **Responsive Design**: Mobile-first approach with Material-UI components
 - **SCSS Animations**: Smooth transitions with Framer Motion and React Spring
 - **Interactive Cards**: Animated medicine cards with hover effects and status indicators
@@ -27,6 +29,7 @@ A modern, full-stack **DevOps-based Inventory Management System** specifically d
 - **Accessibility**: ARIA compliant with keyboard navigation
 
 ### 🔒 Security & Best Practices
+
 - **Environment Variables**: All sensitive data externalized
 - **JWT Authentication**: Ready for user authentication implementation
 - **Input Validation**: Comprehensive data validation on both frontend and backend
@@ -36,6 +39,7 @@ A modern, full-stack **DevOps-based Inventory Management System** specifically d
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 18, Material-UI v5, Apollo Client, SCSS
 - **Backend**: Node.js 18, Express.js, Apollo Server, GraphQL
 - **Database**: MongoDB with Mongoose ODM
@@ -57,7 +61,9 @@ pharmacy-inventory/
 ## Features
 
 - **Medicine Management**: Add, edit, delete, and search medicines
+
 1. **Backend setup**
+
    ```bash
    cd backend
    npm install
@@ -65,6 +71,7 @@ pharmacy-inventory/
    ```
 
 2. **Frontend setup** (in new terminal)
+
    ```bash
    cd frontend
    npm install
@@ -78,6 +85,7 @@ pharmacy-inventory/
 ## 🚀 Deployment
 
 ### 📦 Docker Deployment
+
 ```bash
 # Build and push to Docker Hub
 docker build -t yourusername/pharmacy-backend ./backend
@@ -87,6 +95,7 @@ docker push yourusername/pharmacy-frontend
 ```
 
 ### ☸️ Kubernetes Deployment
+
 ```bash
 # Update image names in k8s manifests
 sed -i 's|your-dockerhub-username|yourusername|g' k8s/*.yaml
@@ -96,6 +105,7 @@ kubectl apply -f k8s/
 ```
 
 ### 🔄 CI/CD with GitHub Actions
+
 - Push to `main` branch triggers automatic deployment
 - Configure GitHub Secrets:
   - `DOCKER_USERNAME`
@@ -107,11 +117,13 @@ kubectl apply -f k8s/
 ⚠️ **Important**: Never commit sensitive information to version control!
 
 ### Environment Variables
+
 - Copy `.env.example` files and update with your values
 - Use strong passwords and unique secrets
 - Rotate credentials regularly
 
 ### Production Security
+
 - Use HTTPS in production
 - Implement proper authentication and authorization
 - Use Kubernetes secrets for sensitive data
@@ -121,11 +133,13 @@ kubectl apply -f k8s/
 ## 📊 API Documentation
 
 ### GraphQL Endpoints
+
 - **Medicines**: CRUD operations, stock management
-- **Suppliers**: Supplier management and relationships  
+- **Suppliers**: Supplier management and relationships
 - **Orders**: Order creation and tracking
 
 ### Sample Queries
+
 ```graphql
 # Get all medicines
 query GetMedicines {
@@ -181,6 +195,7 @@ For support, email dev@pharmacy.com or create an issue in this repository.
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **Node.js** 18+ ([Download](https://nodejs.org/))
 - **Docker & Docker Compose** ([Download](https://docker.com/))
 - **Git** ([Download](https://git-scm.com/))
@@ -189,19 +204,21 @@ For support, email dev@pharmacy.com or create an issue in this repository.
 ### 🔧 Environment Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Nirmalkoswatta/pharmacy-inventory.git
    cd pharmacy-inventory
    ```
 
 2. **Set up environment variables**
+
    ```bash
    # Backend environment
    cp backend/.env.example backend/.env
-   
+
    # Frontend environment
    cp frontend/.env.example frontend/.env
-   
+
    # Update the values in both .env files with your configuration
    ```
 
@@ -215,6 +232,7 @@ For support, email dev@pharmacy.com or create an issue in this repository.
 ### 🐳 Local Development with Docker Compose
 
 1. **Start the complete stack**
+
    ```bash
    docker-compose up --build
    ```
@@ -238,6 +256,7 @@ For support, email dev@pharmacy.com or create an issue in this repository.
 ## Development
 
 ### Backend Development
+
 ```bash
 cd backend
 npm install
@@ -245,6 +264,7 @@ npm run dev
 ```
 
 ### Frontend Development
+
 ```bash
 cd frontend
 npm install
@@ -254,6 +274,7 @@ npm start
 ## CI/CD
 
 The project uses GitHub Actions for automated builds and deployments. On every push to the main branch:
+
 1. Docker images are built and pushed to Docker Hub
 2. Kubernetes manifests can be automatically deployed (optional)
 

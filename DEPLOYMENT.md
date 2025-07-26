@@ -7,8 +7,11 @@ This guide covers deployment options for the Pharmacy Inventory Management Syste
 ## Deployment Options
 
 ### 1. Local Development (Docker Compose)
+
 ### 2. Staging Environment (Docker Compose)
+
 ### 3. Production (Kubernetes)
+
 ### 4. Cloud Deployments (AWS, GCP, Azure)
 
 ---
@@ -16,6 +19,7 @@ This guide covers deployment options for the Pharmacy Inventory Management Syste
 ## 1. Local Development Deployment
 
 ### Quick Start
+
 ```bash
 # Using setup script (recommended)
 ./setup.sh  # Linux/Mac
@@ -27,13 +31,16 @@ docker-compose up --build -d
 ```
 
 ### Access Points
+
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:4000
 - **GraphQL Playground**: http://localhost:4000/graphql
 - **MongoDB Admin**: http://localhost:8081
 
 ### Environment Variables
+
 Copy and customize environment files:
+
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
@@ -46,13 +53,14 @@ cp frontend/.env.example frontend/.env
 ### Using Docker Compose with Overrides
 
 Create `docker-compose.staging.yml`:
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   frontend:
     environment:
       - REACT_APP_GRAPHQL_URI=https://api-staging.yoursite.com/graphql
-  
+
   backend:
     environment:
       - NODE_ENV=staging
@@ -60,6 +68,7 @@ services:
 ```
 
 Deploy:
+
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d
 ```
@@ -69,6 +78,7 @@ docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d
 ## 3. Production Deployment (Kubernetes)
 
 ### Prerequisites
+
 - Kubernetes cluster (v1.20+)
 - kubectl configured
 - Docker Hub account for images
@@ -88,6 +98,7 @@ docker push yourusername/pharmacy-frontend:v1.0.0
 ### Step 2: Update Kubernetes Manifests
 
 Update image references in `k8s/*.yaml`:
+
 ```bash
 sed -i 's|your-dockerhub-username|yourusername|g' k8s/*.yaml
 sed -i 's|:latest|:v1.0.0|g' k8s/*.yaml
@@ -110,6 +121,7 @@ kubectl get services -n pharmacy
 ### Step 4: Access the Application
 
 #### Using NodePort
+
 ```bash
 # Get the NodePort
 kubectl get service frontend -n pharmacy
@@ -118,6 +130,7 @@ kubectl get service frontend -n pharmacy
 ```
 
 #### Using Ingress (Recommended)
+
 ```bash
 # Install NGINX Ingress Controller (if not already installed)
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
@@ -138,10 +151,12 @@ echo "127.0.0.1 pharmacy.local" >> /etc/hosts
 ### AWS EKS
 
 #### Prerequisites
+
 - AWS CLI configured
 - eksctl installed
 
 #### Setup
+
 ```bash
 # Create EKS cluster
 eksctl create cluster --name pharmacy-cluster --region us-west-2
@@ -154,6 +169,7 @@ kubectl apply -f k8s/ -n pharmacy
 ```
 
 #### Using ALB Ingress
+
 ```bash
 # Install AWS Load Balancer Controller
 kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
@@ -165,6 +181,7 @@ kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/
 ### Google GKE
 
 #### Setup
+
 ```bash
 # Create GKE cluster
 gcloud container clusters create pharmacy-cluster \
@@ -181,6 +198,7 @@ kubectl apply -f k8s/ -n pharmacy
 ### Azure AKS
 
 #### Setup
+
 ```bash
 # Create resource group
 az group create --name pharmacy-rg --location eastus
@@ -207,11 +225,13 @@ kubectl apply -f k8s/ -n pharmacy
 ### GitHub Actions Setup
 
 1. **Add secrets to GitHub repository**:
+
    - `DOCKER_USERNAME`: Your Docker Hub username
    - `DOCKER_PASSWORD`: Your Docker Hub password/token
    - `KUBE_CONFIG`: Base64 encoded kubeconfig file
 
 2. **Generate kubeconfig secret**:
+
 ```bash
 # Get your kubeconfig
 cat ~/.kube/config | base64 -w 0
@@ -222,6 +242,7 @@ cat ~/.kube/config | base64 -w 0
 3. **Push to main branch** triggers automatic deployment
 
 ### Pipeline Features
+
 - ✅ Automated testing
 - ✅ Security scanning
 - ✅ Multi-architecture builds
@@ -233,6 +254,7 @@ cat ~/.kube/config | base64 -w 0
 ## Monitoring and Observability
 
 ### Health Checks
+
 ```bash
 # Check application health
 curl http://your-domain/health
@@ -242,6 +264,7 @@ curl http://your-domain:4000/health
 ```
 
 ### Kubernetes Monitoring
+
 ```bash
 # Check pods
 kubectl get pods -n pharmacy
@@ -255,6 +278,7 @@ kubectl top pods -n pharmacy
 ```
 
 ### Prometheus & Grafana (Optional)
+
 ```bash
 # Install monitoring stack
 kubectl create namespace monitoring
@@ -266,6 +290,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 ## Backup and Recovery
 
 ### Database Backup
+
 ```bash
 # MongoDB backup
 kubectl exec -it deployment/mongo -n pharmacy -- mongodump --db pharmacy --out /tmp/backup
@@ -275,6 +300,7 @@ kubectl cp pharmacy/mongo-pod:/tmp/backup ./backup
 ```
 
 ### Application Data
+
 ```bash
 # Backup persistent volumes
 kubectl get pv
@@ -286,22 +312,26 @@ kubectl describe pv <volume-name>
 ## Security Best Practices
 
 ### 1. Image Security
+
 - Use specific image tags (not `latest`)
 - Scan images for vulnerabilities
 - Use minimal base images
 
 ### 2. Kubernetes Security
+
 - Use namespaces for isolation
 - Implement RBAC
 - Use network policies
 - Set resource limits
 
 ### 3. Secrets Management
+
 - Never commit secrets to Git
 - Use Kubernetes secrets or external secret managers
 - Rotate secrets regularly
 
 ### 4. Network Security
+
 - Use HTTPS/TLS
 - Implement proper CORS policies
 - Use network policies for pod-to-pod communication
@@ -311,11 +341,14 @@ kubectl describe pv <volume-name>
 ## Scaling
 
 ### Horizontal Pod Autoscaler
+
 Already configured in `k8s/` manifests:
+
 - Backend: 2-10 replicas based on CPU/Memory
 - Frontend: 2-5 replicas based on CPU/Memory
 
 ### Manual Scaling
+
 ```bash
 # Scale backend
 kubectl scale deployment backend --replicas=5 -n pharmacy
@@ -331,6 +364,7 @@ kubectl scale deployment frontend --replicas=3 -n pharmacy
 ### Common Issues
 
 #### 1. Pods Not Starting
+
 ```bash
 # Check pod status
 kubectl describe pod <pod-name> -n pharmacy
@@ -340,6 +374,7 @@ kubectl logs <pod-name> -n pharmacy
 ```
 
 #### 2. Database Connection Issues
+
 ```bash
 # Check MongoDB pod
 kubectl exec -it deployment/mongo -n pharmacy -- mongosh
@@ -349,6 +384,7 @@ kubectl get configmap backend-config -n pharmacy -o yaml
 ```
 
 #### 3. Image Pull Errors
+
 ```bash
 # Check image name and tag
 kubectl describe pod <pod-name> -n pharmacy
@@ -358,6 +394,7 @@ docker pull yourusername/pharmacy-backend:v1.0.0
 ```
 
 #### 4. Service Discovery Issues
+
 ```bash
 # Check services
 kubectl get svc -n pharmacy
@@ -371,6 +408,7 @@ kubectl exec -it deployment/backend -n pharmacy -- curl http://mongo:27017
 ## Rollback Procedures
 
 ### Kubernetes Rollback
+
 ```bash
 # Check rollout history
 kubectl rollout history deployment/backend -n pharmacy
@@ -383,6 +421,7 @@ kubectl rollout undo deployment/backend --to-revision=2 -n pharmacy
 ```
 
 ### Docker Compose Rollback
+
 ```bash
 # Stop current version
 docker-compose down
@@ -400,16 +439,19 @@ docker-compose up -d
 ## Performance Optimization
 
 ### Database Optimization
+
 - Ensure proper indexing
 - Monitor query performance
 - Use connection pooling
 
 ### Application Optimization
+
 - Enable gzip compression
 - Use CDN for static assets
 - Implement caching strategies
 
 ### Kubernetes Optimization
+
 - Set appropriate resource requests/limits
 - Use node affinity for optimal scheduling
 - Monitor cluster resource usage
@@ -419,6 +461,7 @@ docker-compose up -d
 ## Support and Maintenance
 
 ### Regular Tasks
+
 - Monitor application logs
 - Check resource usage
 - Update dependencies
@@ -426,7 +469,9 @@ docker-compose up -d
 - Security updates
 
 ### Monitoring Alerts
+
 Set up alerts for:
+
 - Pod restart loops
 - High memory/CPU usage
 - Database connection failures
@@ -435,6 +480,7 @@ Set up alerts for:
 ---
 
 For additional help, check:
+
 - [DEVELOPMENT.md](DEVELOPMENT.md) for development setup
 - [README.md](README.md) for project overview
 - GitHub Issues for known problems

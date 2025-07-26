@@ -19,5 +19,6 @@
   "resetMocks": true,
   "restoreMocks": true,
   "detectOpenHandles": true,
-  "passWithNoTests": true
+  "passWithNoTests": true,
+  "testTimeout": 30000
 }

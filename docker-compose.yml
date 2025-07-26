@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # MongoDB Database
@@ -24,7 +24,7 @@ services:
 
   # Backend API
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: pharmacy-backend
@@ -45,7 +45,15 @@ services:
     networks:
       - pharmacy-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4000/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -53,7 +61,7 @@ services:
 
   # Frontend React App
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: pharmacy-frontend
@@ -68,7 +76,15 @@ services:
     networks:
       - pharmacy-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

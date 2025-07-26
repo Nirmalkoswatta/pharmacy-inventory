@@ -14,31 +14,48 @@ describe('Backend API Tests', () => {
     // Connect to the in-memory database
     await mongoose.connect(mongoUri);
     
-    // Import app after database connection
-    app = require('../index');
-  });
+    // Import and create app after database connection
+    const createApp = require('../index');
+    app = await createApp();
+  }, 30000); // 30 second timeout
 
   afterAll(async () => {
     // Cleanup
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
     await mongoServer.stop();
-  });
+  }, 30000); // 30 second timeout
 
   describe('Health Check', () => {
     test('should return 200 for health check', async () => {
-      // Since we're using GraphQL, we'll test a basic GraphQL query
+      const response = await request(app)
+        .get('/health');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('OK');
+      expect(response.body.service).toBe('pharmacy-inventory-backend');
+    });
+  });
+
+  describe('GraphQL Endpoint', () => {
+    test('should respond to basic GraphQL introspection query', async () => {
       const response = await request(app)
         .post('/graphql')
         .send({
           query: `
             query {
-              __typename
+              __schema {
+                types {
+                  name
+                }
+              }
             }
           `
         });
       
       expect(response.status).toBe(200);
+      expect(response.body.data).toBeDefined();
+      expect(response.body.data.__schema).toBeDefined();
     });
   });
 

@@ -88,4 +88,13 @@ medicineSchema.virtual('isExpiringSoon').get(function() {
   return this.expiryDate <= thirtyDaysFromNow && this.expiryDate > new Date();
 });
 
+// Virtual for days until expiry
+medicineSchema.virtual('daysUntilExpiry').get(function() {
+  const today = new Date();
+  const expiry = new Date(this.expiryDate);
+  const timeDiff = expiry.getTime() - today.getTime();
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  return daysDiff;
+});
+
 module.exports = mongoose.model('Medicine', medicineSchema);

@@ -7,7 +7,7 @@ require('dotenv').config();
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 
-async function startServer() {
+async function createApp() {
   const app = express();
   
   // CORS configuration
@@ -40,6 +40,12 @@ async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
 
+  return app;
+}
+
+async function startServer() {
+  const app = await createApp();
+
   // MongoDB connection
   const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/pharmacy';
   
@@ -58,8 +64,10 @@ async function startServer() {
   
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 GraphQL Playground: http://localhost:${PORT}${server.graphqlPath}`);
+    console.log(`📊 GraphQL Playground: http://localhost:${PORT}/graphql`);
   });
+
+  return app;
 }
 
 // Handle graceful shutdown
@@ -75,7 +83,13 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-startServer().catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+// Export for testing
+module.exports = createApp;
+
+// Only start server if this file is run directly
+if (require.main === module) {
+  startServer().catch(error => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}
