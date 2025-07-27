@@ -1,0 +1,63 @@
+// GraphQL Mutation to Add a New Medicine with Supplier
+// You can use this in the GraphQL Playground at http://localhost:4000/graphql
+
+mutation CreateMedicine {
+  createMedicine(input: {
+    name: "Paracetamol 500mg"
+    description: "Pain relief and fever reducer"
+    manufacturer: "Apollo Pharmaceuticals"
+    category: Tablet
+    price: 25.50
+    stockQuantity: 100
+    minStockLevel: 20
+    maxStockLevel: 500
+    batchNumber: "PCM2024001"
+    expiryDate: "2025-12-31"
+    supplierId: "6886708ed818c2f8f38558c1"  # MediSupply Inc.
+  }) {
+    id
+    name
+    manufacturer
+    category
+    price
+    stockQuantity
+    batchNumber
+    expiryDate
+    supplier {
+      name
+      contactPerson
+      email
+    }
+    isLowStock
+    isExpired
+    isExpiringSoon
+  }
+}
+
+// Alternative - Add medicine with a different supplier:
+mutation CreateMedicineWithDifferentSupplier {
+  createMedicine(input: {
+    name: "Amoxicillin 250mg"
+    description: "Antibiotic for bacterial infections"
+    manufacturer: "Zydus Pharmaceuticals"
+    category: Capsule
+    price: 45.00
+    stockQuantity: 75
+    minStockLevel: 15
+    maxStockLevel: 300
+    batchNumber: "AMX2024002"
+    expiryDate: "2026-06-30"
+    supplierId: "6886708ed818c2f8f38558c2"  # PharmaCorp
+  }) {
+    id
+    name
+    manufacturer
+    category
+    price
+    stockQuantity
+    supplier {
+      name
+      contactPerson
+    }
+  }
+}

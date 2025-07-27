@@ -49,7 +49,7 @@ const supplierSchema = new mongoose.Schema({
       type: String,
       required: true,
       trim: true,
-      default: 'India'
+      default: 'Sri Lanka'
     }
   },
   licenseNumber: {
@@ -64,8 +64,8 @@ const supplierSchema = new mongoose.Schema({
   },
   paymentTerms: {
     type: String,
-    enum: ['Cash', 'Net 30', 'Net 60', 'Net 90'],
-    default: 'Net 30'
+    enum: ['Cash', 'Net_30', 'Net_60', 'Net_90'],
+    default: 'Net_30'
   },
   rating: {
     type: Number,

@@ -27,57 +27,57 @@ async function populateDatabase() {
     // Create sample suppliers
     const suppliers = await Supplier.create([
       {
-        name: 'MediSupply Inc.',
-        contactPerson: 'John Smith',
-        email: 'john@medisupply.com',
-        phone: '+1-555-0101',
+        name: 'Ceylon Medical Supplies',
+        contactPerson: 'Samantha Perera',
+        email: 'samantha@ceylonmedical.lk',
+        phone: '+94-77-123-4567',
         address: {
-          street: '123 Medical District',
-          city: 'Healthcare City',
-          state: 'California',
-          zipCode: '12345',
-          country: 'USA'
+          street: '15 Hospital Road',
+          city: 'Matale',
+          state: 'Central Province',
+          zipCode: '21000',
+          country: 'Sri Lanka'
         },
-        licenseNumber: 'LIC001',
-        taxId: 'TAX001',
-        paymentTerms: 'Net 30',
-        rating: 4,
+        licenseNumber: 'SL-DRUG-2024-001',
+        taxId: 'VAT-123456789',
+        paymentTerms: 'Net_30',
+        rating: 4.5,
         isActive: true
       },
       {
-        name: 'PharmaCorp',
-        contactPerson: 'Sarah Johnson',
-        email: 'sarah@pharmacorp.com',
-        phone: '+1-555-0202',
+        name: 'Lanka Pharma Distributors',
+        contactPerson: 'Kamal Fernando',
+        email: 'kamal@lankapharma.lk',
+        phone: '+94-81-234-5678',
         address: {
-          street: '456 Pharma Street',
-          city: 'Medicine Town',
-          state: 'New York',
-          zipCode: '67890',
-          country: 'USA'
+          street: '42 Temple Street',
+          city: 'Matale',
+          state: 'Central Province',
+          zipCode: '21000',
+          country: 'Sri Lanka'
         },
-        licenseNumber: 'LIC002',
-        taxId: 'TAX002',
-        paymentTerms: 'Net 60',
-        rating: 5,
+        licenseNumber: 'SL-DRUG-2024-002',
+        taxId: 'VAT-987654321',
+        paymentTerms: 'Net_60',
+        rating: 4.8,
         isActive: true
       },
       {
-        name: 'Global Health Solutions',
-        contactPerson: 'Dr. Michael Brown',
-        email: 'michael@globalhealthsolutions.com',
-        phone: '+1-555-0303',
+        name: 'Matale Health Solutions',
+        contactPerson: 'Dr. Nimal Silva',
+        email: 'nimal@matalehealth.lk',
+        phone: '+94-66-345-6789',
         address: {
-          street: '789 Health Avenue',
-          city: 'Wellness City',
-          state: 'Texas',
-          zipCode: '54321',
-          country: 'USA'
+          street: '88 Kandy Road',
+          city: 'Matale',
+          state: 'Central Province',
+          zipCode: '21000',
+          country: 'Sri Lanka'
         },
-        licenseNumber: 'LIC003',
-        taxId: 'TAX003',
+        licenseNumber: 'SL-DRUG-2024-003',
+        taxId: 'VAT-456789123',
         paymentTerms: 'Cash',
-        rating: 4,
+        rating: 4.2,
         isActive: true
       }
     ]);

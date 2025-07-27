@@ -1,0 +1,36 @@
+// GraphQL Mutation to Add a New Supplier
+// You can use this in the GraphQL Playground at http://localhost:4000/graphql
+
+mutation CreateSupplier {
+  createSupplier(input: {
+    name: "Matale Pharmaceuticals"
+    contactPerson: "Dr. Sunil Jayawardena"
+    email: "sunil.jayawardena@matalepharm.lk"
+    phone: "+94-66-567-8901"
+    address: {
+      street: "67 Central Road, Matale Town"
+      city: "Matale"
+      state: "Central Province"
+      zipCode: "21000"
+      country: "Sri Lanka"
+    }
+    licenseNumber: "SL-DRUG-2024-004"
+    taxId: "VAT-789123456"
+    paymentTerms: Net_30
+    rating: 4.5
+    notes: "Specializes in cardiac and diabetes medications. Reliable delivery across Central Province."
+  }) {
+    id
+    name
+    contactPerson
+    email
+    phone
+    fullAddress
+    licenseNumber
+    paymentTerms
+    rating
+    isActive
+    notes
+    createdAt
+  }
+}

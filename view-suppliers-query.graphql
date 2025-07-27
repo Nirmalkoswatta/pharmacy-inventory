@@ -1,0 +1,46 @@
+// GraphQL Query to View All Suppliers
+// You can use this in the GraphQL Playground at http://localhost:4000/graphql
+
+query GetAllSuppliers {
+  suppliers {
+    id
+    name
+    contactPerson
+    email
+    phone
+    fullAddress
+    licenseNumber
+    paymentTerms
+    rating
+    isActive
+    notes
+    createdAt
+  }
+}
+
+// Query to see medicines by a specific supplier
+query GetMedicinesBySupplier($supplierId: ID!) {
+  medicinesBySupplier(supplierId: $supplierId) {
+    id
+    name
+    manufacturer
+    category
+    price
+    stockQuantity
+    minStockLevel
+    expiryDate
+    batchNumber
+    isLowStock
+    isExpired
+    isExpiringSoon
+    supplier {
+      name
+      contactPerson
+    }
+  }
+}
+
+// Query Variables for the above query (replace with actual supplier ID):
+// {
+//   "supplierId": "SUPPLIER_ID_HERE"
+// }

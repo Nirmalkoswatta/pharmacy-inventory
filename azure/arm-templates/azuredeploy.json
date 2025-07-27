@@ -1,0 +1,265 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "defaultValue": "pharmacy-inventory",
+      "metadata": {
+        "description": "Name of the project"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "acrSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "SKU for Azure Container Registry"
+      }
+    },
+    "appServicePlanSku": {
+      "type": "string",
+      "defaultValue": "B1",
+      "allowedValues": [
+        "F1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1V2",
+        "P2V2",
+        "P3V2"
+      ],
+      "metadata": {
+        "description": "SKU for App Service Plan"
+      }
+    },
+    "cosmosDbOfferThroughput": {
+      "type": "int",
+      "defaultValue": 400,
+      "minValue": 400,
+      "maxValue": 1000000,
+      "metadata": {
+        "description": "The throughput for the MongoDB database"
+      }
+    }
+  },
+  "variables": {
+    "acrName": "[concat(parameters('projectName'), 'acr', uniqueString(resourceGroup().id))]",
+    "appServicePlanName": "[concat(parameters('projectName'), '-plan')]",
+    "backendAppName": "[concat(parameters('projectName'), '-backend-', uniqueString(resourceGroup().id))]",
+    "frontendAppName": "[concat(parameters('projectName'), '-frontend-', uniqueString(resourceGroup().id))]",
+    "cosmosAccountName": "[concat(parameters('projectName'), '-cosmos-', uniqueString(resourceGroup().id))]",
+    "cosmosDatabaseName": "pharmacy",
+    "applicationInsightsName": "[concat(parameters('projectName'), '-insights')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2021-12-01-preview",
+      "name": "[variables('acrName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('acrSku')]"
+      },
+      "properties": {
+        "adminUserEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2021-10-15",
+      "name": "[variables('cosmosAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "MongoDB",
+      "properties": {
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session"
+        },
+        "locations": [
+          {
+            "locationName": "[parameters('location')]",
+            "failoverPriority": 0
+          }
+        ],
+        "databaseAccountOfferType": "Standard",
+        "enableMultipleWriteLocations": false,
+        "apiProperties": {
+          "serverVersion": "4.0"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases",
+      "apiVersion": "2021-10-15",
+      "name": "[concat(variables('cosmosAccountName'), '/', variables('cosmosDatabaseName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosAccountName'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[variables('cosmosDatabaseName')]"
+        },
+        "options": {
+          "throughput": "[parameters('cosmosDbOfferThroughput')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2021-02-01",
+      "name": "[variables('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      },
+      "sku": {
+        "name": "[parameters('appServicePlanSku')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-02-01",
+      "name": "[variables('backendAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosAccountName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+      ],
+      "kind": "app,linux,container",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[concat('DOCKER|', variables('acrName'), '.azurecr.io/pharmacy-backend:latest')]",
+          "appSettings": [
+            {
+              "name": "NODE_ENV",
+              "value": "production"
+            },
+            {
+              "name": "PORT",
+              "value": "80"
+            },
+            {
+              "name": "MONGO_URI",
+              "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosAccountName')), '2021-10-15').connectionStrings[0].connectionString]"
+            },
+            {
+              "name": "FRONTEND_URL",
+              "value": "[concat('https://', variables('frontendAppName'), '.azurewebsites.net')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "[concat('https://', variables('acrName'), '.azurecr.io')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": "[variables('acrName')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-12-01-preview').passwords[0].value]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-02-01",
+      "name": "[variables('frontendAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('backendAppName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+      ],
+      "kind": "app,linux,container",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[concat('DOCKER|', variables('acrName'), '.azurecr.io/pharmacy-frontend:latest')]",
+          "appSettings": [
+            {
+              "name": "REACT_APP_GRAPHQL_URI",
+              "value": "[concat('https://', variables('backendAppName'), '.azurewebsites.net/graphql')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "[concat('https://', variables('acrName'), '.azurecr.io')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": "[variables('acrName')]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-12-01-preview').passwords[0].value]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "acrName": {
+      "type": "string",
+      "value": "[variables('acrName')]"
+    },
+    "acrLoginServer": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))).loginServer]"
+    },
+    "backendUrl": {
+      "type": "string",
+      "value": "[concat('https://', variables('backendAppName'), '.azurewebsites.net')]"
+    },
+    "frontendUrl": {
+      "type": "string",
+      "value": "[concat('https://', variables('frontendAppName'), '.azurewebsites.net')]"
+    },
+    "cosmosAccountName": {
+      "type": "string",
+      "value": "[variables('cosmosAccountName')]"
+    },
+    "applicationInsightsKey": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+    }
+  }
+}

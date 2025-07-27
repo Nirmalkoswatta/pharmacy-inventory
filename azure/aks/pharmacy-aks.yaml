@@ -1,0 +1,240 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pharmacy-inventory
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acr-secret
+  namespace: pharmacy-inventory
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: # This will be populated by the deployment script
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pharmacy-config
+  namespace: pharmacy-inventory
+data:
+  NODE_ENV: "production"
+  PORT: "4000"
+  MONGO_URI: "mongodb://pharmacy-mongo:27017/pharmacy"
+  FRONTEND_URL: "https://pharmacy-inventory.eastus.cloudapp.azure.com"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-mongo
+  namespace: pharmacy-inventory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pharmacy-mongo
+  template:
+    metadata:
+      labels:
+        app: pharmacy-mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:6.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: "pharmacy"
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  namespace: pharmacy-inventory
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: managed-csi
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pharmacy-mongo
+  namespace: pharmacy-inventory
+spec:
+  selector:
+    app: pharmacy-mongo
+  ports:
+  - port: 27017
+    targetPort: 27017
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-backend
+  namespace: pharmacy-inventory
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pharmacy-backend
+  template:
+    metadata:
+      labels:
+        app: pharmacy-backend
+    spec:
+      imagePullSecrets:
+      - name: acr-secret
+      containers:
+      - name: backend
+        image: # This will be populated by the deployment script
+        ports:
+        - containerPort: 4000
+        envFrom:
+        - configMapRef:
+            name: pharmacy-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pharmacy-backend
+  namespace: pharmacy-inventory
+spec:
+  selector:
+    app: pharmacy-backend
+  ports:
+  - port: 4000
+    targetPort: 4000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-frontend
+  namespace: pharmacy-inventory
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pharmacy-frontend
+  template:
+    metadata:
+      labels:
+        app: pharmacy-frontend
+    spec:
+      imagePullSecrets:
+      - name: acr-secret
+      containers:
+      - name: frontend
+        image: # This will be populated by the deployment script
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_GRAPHQL_URI
+          value: "https://pharmacy-inventory.eastus.cloudapp.azure.com/graphql"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pharmacy-frontend
+  namespace: pharmacy-inventory
+spec:
+  selector:
+    app: pharmacy-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pharmacy-ingress
+  namespace: pharmacy-inventory
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+spec:
+  rules:
+  - host: pharmacy-inventory.eastus.cloudapp.azure.com
+    http:
+      paths:
+      - path: /graphql
+        pathType: Prefix
+        backend:
+          service:
+            name: pharmacy-backend
+            port:
+              number: 4000
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: pharmacy-backend
+            port:
+              number: 4000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pharmacy-frontend
+            port:
+              number: 80

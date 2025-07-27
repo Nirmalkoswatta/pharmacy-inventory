@@ -11,6 +11,11 @@ yarn-error.log*
 .env.test
 .env.production
 
+# Azure deployment credentials and outputs
+azure/acr-credentials.json
+azure/*/deployment-info.json
+azure/*/deployment-outputs.json
+
 # Logs
 logs/
 *.log

@@ -1,0 +1,183 @@
+# Azure DevOps Pipeline for Pharmacy Inventory
+# This pipeline builds, tests, and deploys the application to Azure
+
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+  paths:
+    exclude:
+    - README.md
+    - docs/*
+
+variables:
+  # Azure service connection (configure in Azure DevOps)
+  azureServiceConnection: 'azure-connection'
+  
+  # Azure Container Registry
+  containerRegistry: 'pharmacyacr.azurecr.io'
+  
+  # Resource group and location
+  resourceGroupName: 'pharmacy-inventory-rg'
+  location: 'East US'
+  
+  # Image names and tags
+  backendImageRepository: 'pharmacy-backend'
+  frontendImageRepository: 'pharmacy-frontend'
+  tag: '$(Build.BuildId)'
+  
+  # Agent pool
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Test
+  displayName: 'Test Stage'
+  jobs:
+  - job: BackendTests
+    displayName: 'Backend Tests'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+    
+    - script: |
+        cd backend
+        npm ci
+        npm run test
+      displayName: 'Run Backend Tests'
+    
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: JUnit
+        testResultsFiles: 'backend/test-results.xml'
+      displayName: 'Publish Backend Test Results'
+
+  - job: FrontendTests
+    displayName: 'Frontend Tests'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+    
+    - script: |
+        cd frontend
+        npm ci
+        npm run test -- --coverage --watchAll=false
+      displayName: 'Run Frontend Tests'
+    
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: JUnit
+        testResultsFiles: 'frontend/test-results.xml'
+      displayName: 'Publish Frontend Test Results'
+
+- stage: Build
+  displayName: 'Build Stage'
+  dependsOn: Test
+  jobs:
+  - job: BuildImages
+    displayName: 'Build Docker Images'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Build and Push Backend Image'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr build --registry $(containerRegistry) \
+            --image $(backendImageRepository):$(tag) \
+            --image $(backendImageRepository):latest \
+            ./backend
+    
+    - task: AzureCLI@2
+      displayName: 'Build and Push Frontend Image'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr build --registry $(containerRegistry) \
+            --image $(frontendImageRepository):$(tag) \
+            --image $(frontendImageRepository):latest \
+            ./frontend
+
+- stage: DeployDev
+  displayName: 'Deploy to Development'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+  jobs:
+  - deployment: DeployToDev
+    displayName: 'Deploy to Development Environment'
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: 'Deploy to Azure Container Instances (Dev)'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Deploy to ACI for development environment
+                az container create \
+                  --resource-group $(resourceGroupName)-dev \
+                  --name pharmacy-backend-dev \
+                  --image $(containerRegistry)/$(backendImageRepository):$(tag) \
+                  --registry-login-server $(containerRegistry) \
+                  --registry-username $(acrUsername) \
+                  --registry-password $(acrPassword) \
+                  --environment-variables NODE_ENV=development \
+                  --ports 4000 \
+                  --cpu 1 --memory 1.5
+
+- stage: DeployProd
+  displayName: 'Deploy to Production'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployToProd
+    displayName: 'Deploy to Production Environment'
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: 'Deploy to Azure App Service (Prod)'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Update App Service with new images
+                az webapp config container set \
+                  --name pharmacy-backend-prod \
+                  --resource-group $(resourceGroupName) \
+                  --docker-custom-image-name $(containerRegistry)/$(backendImageRepository):$(tag)
+                
+                az webapp config container set \
+                  --name pharmacy-frontend-prod \
+                  --resource-group $(resourceGroupName) \
+                  --docker-custom-image-name $(containerRegistry)/$(frontendImageRepository):$(tag)
+                
+                # Restart apps to pull new images
+                az webapp restart --name pharmacy-backend-prod --resource-group $(resourceGroupName)
+                az webapp restart --name pharmacy-frontend-prod --resource-group $(resourceGroupName)
