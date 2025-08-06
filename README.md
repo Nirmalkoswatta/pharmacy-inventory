@@ -9,7 +9,7 @@
 
 A modern, full-stack **DevOps-based Inventory Management System** specifically designed for pharmacies. Built with enterprise-grade architecture featuring React frontend, Node.js GraphQL backend, MongoDB database, and complete DevOps pipeline with Docker and Kubernetes.
 
-## ✨ Features
+## ✨ Features      
 
 ### 🏥 Core Functionality
 
@@ -297,3 +297,4 @@ MIT License
 #   p h a r m a c y - i n v e n t o r y 
  
  
+
