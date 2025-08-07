@@ -20,10 +20,13 @@ describe('Backend API Tests', () => {
   }, 30000); // 30 second timeout
 
   afterAll(async () => {
-    // Cleanup
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-    await mongoServer.stop();
+    try {
+      await mongoose.connection.dropDatabase();
+      if (mongoServer) await mongoServer.stop();
+      await mongoose.connection.close();
+    } catch (err) {
+      console.error('Error during afterAll cleanup:', err);
+    }
   }, 30000); // 30 second timeout
 
   describe('Health Check', () => {
