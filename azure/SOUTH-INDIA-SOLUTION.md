@@ -7,10 +7,11 @@ I have successfully updated your deployment configuration to use **South India**
 ## 🌏 **South India Deployment Details**
 
 ### Backend App (South India)
+
 - **Name**: `pharmacy-backend-si-1189`
 - **URL**: `https://pharmacy-backend-si-1189.azurewebsites.net`
 - **Resource Group**: `pharmacy-southindia-3094`
-- **Location**: **South India** 
+- **Location**: **South India**
 - **Status**: Currently deploying (may take a few minutes to fully start)
 
 ## 📁 **Updated Configuration Files**
@@ -22,16 +23,19 @@ I have successfully updated your deployment configuration to use **South India**
 ## 🛠️ **Scripts Available for South India**
 
 ### Primary Deployment Script:
+
 ```powershell
 .\deploy-southindia.ps1
 ```
 
 ### Health Check:
+
 ```powershell
 .\health-check-simple.ps1
 ```
 
 ### 403 Error Fix:
+
 ```powershell
 .\simple-fix-403.ps1
 ```
@@ -39,16 +43,19 @@ I have successfully updated your deployment configuration to use **South India**
 ## 🎯 **Working Solutions (Ordered by Preference)**
 
 ### Option 1: Use Existing South India Backend ⭐
+
 - **Backend**: `https://pharmacy-backend-si-1189.azurewebsites.net`
 - **Status**: May take 10-15 minutes to fully start
 - **Region**: South India (closest to you)
 
 ### Option 2: Original Pharmacy Inventory Resource Group
+
 - **Backend**: Still available in your original `pharmacy-inventory` resource group
 - **Region**: South India
 - **Note**: May still have quota issues
 
 ### Option 3: East US Backup (If South India has issues)
+
 - **Backend**: `https://pharmacy-backend-8535.azurewebsites.net`
 - **Region**: East US
 - **Status**: Available as backup
@@ -70,6 +77,7 @@ I have successfully updated your deployment configuration to use **South India**
 ## 🔧 **Frontend Configuration Update**
 
 Update your React app's environment variables:
+
 ```
 REACT_APP_GRAPHQL_URI=https://pharmacy-backend-si-1189.azurewebsites.net/graphql
 ```
@@ -77,6 +85,7 @@ REACT_APP_GRAPHQL_URI=https://pharmacy-backend-si-1189.azurewebsites.net/graphql
 ## 📞 **If You Need Support**
 
 All scripts are now configured for South India by default. Simply run:
+
 ```powershell
 # Check app status
 .\health-check-simple.ps1

@@ -11,6 +11,7 @@ Your **403 Forbidden error** was caused by **Azure for Students quota exceeded**
 ## 🌐 **NEW WORKING DEPLOYMENT**
 
 ### Backend App
+
 - **Name**: `pharmacy-backend-8535`
 - **URL**: `https://pharmacy-backend-8535.azurewebsites.net`
 - **Health Check**: `https://pharmacy-backend-8535.azurewebsites.net/health`
@@ -30,6 +31,7 @@ Your **403 Forbidden error** was caused by **Azure for Students quota exceeded**
 ## 🚀 **How to Use Your New Backend**
 
 ### Test the API:
+
 ```powershell
 # Health check
 Invoke-WebRequest -Uri "https://pharmacy-backend-8535.azurewebsites.net/health"
@@ -39,7 +41,9 @@ Invoke-WebRequest -Uri "https://pharmacy-backend-8535.azurewebsites.net/health"
 ```
 
 ### Update Frontend Configuration:
+
 Update your React app's GraphQL URI to:
+
 ```
 REACT_APP_GRAPHQL_URI=https://pharmacy-backend-8535.azurewebsites.net/graphql
 ```
@@ -61,6 +65,7 @@ REACT_APP_GRAPHQL_URI=https://pharmacy-backend-8535.azurewebsites.net/graphql
 ## 📞 **If You Need Help**
 
 Run any of these commands:
+
 ```powershell
 .\health-check-simple.ps1          # Check app status
 .\simple-fix-403.ps1               # Fix 403 errors
