@@ -40,6 +40,14 @@ jobs:
           cd backend
           npm ci
 
+      - name: Install libssl1.1 for mongodb-memory-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.22_amd64.deb
+          sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.22_amd64.deb || true
+          rm libssl1.1_1.1.1f-1ubuntu2.22_amd64.deb
+
       - name: Install frontend dependencies
         run: |
           cd frontend
