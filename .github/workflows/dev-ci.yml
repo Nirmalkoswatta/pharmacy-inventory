@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     services:
       mongodb:
@@ -79,7 +79,7 @@ jobs:
 
   docker-build:
     name: Build Docker Images (Test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: test
 
     steps:
