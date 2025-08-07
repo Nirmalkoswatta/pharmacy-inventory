@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
-  Paper, 
   Grid, 
   Card, 
   CardContent,
@@ -34,7 +33,6 @@ import {
   Phone as PhoneIcon,
   LocationOn as LocationIcon,
   Business as BusinessIcon,
-  Star as StarIcon,
   Inventory as InventoryIcon,
   Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,

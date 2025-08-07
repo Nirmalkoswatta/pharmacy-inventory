@@ -30,7 +30,6 @@ import {
   Email as EmailIcon,
   Phone as PhoneIcon,
   Business as BusinessIcon,
-  Star as StarIcon,
   LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { useQuery, useMutation } from '@apollo/client';
