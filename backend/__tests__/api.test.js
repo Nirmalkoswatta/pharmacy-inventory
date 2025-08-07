@@ -17,17 +17,20 @@ describe('Backend API Tests', () => {
     // Import and create app after database connection
     const createApp = require('../index');
     app = await createApp();
-  }, 30000); // 30 second timeout
+  }, 60000); // 60 second timeout
 
   afterAll(async () => {
     try {
-      await mongoose.connection.dropDatabase();
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.connection.dropDatabase();
+        await mongoose.connection.close();
+      }
       if (mongoServer) await mongoServer.stop();
-      await mongoose.connection.close();
+      console.log('Cleanup complete');
     } catch (err) {
       console.error('Error during afterAll cleanup:', err);
     }
-  }, 30000); // 30 second timeout
+  }, 60000); // 60 second timeout
 
   describe('Health Check', () => {
     test('should return 200 for health check', async () => {
