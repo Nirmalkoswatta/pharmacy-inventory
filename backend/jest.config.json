@@ -9,8 +9,13 @@
     "**/*.js",
     "!**/node_modules/**",
     "!**/coverage/**",
+    "!**/minimal/**",
     "!jest.config.js",
     "!index.js"
+  ],
+  "modulePathIgnorePatterns": [
+    "<rootDir>/minimal/",
+    "<rootDir>/node_modules/"
   ],
   "coverageDirectory": "coverage",
   "verbose": true,
