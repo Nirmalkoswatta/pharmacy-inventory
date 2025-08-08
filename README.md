@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org/)
 [![GraphQL](https://img.shields.io/badge/GraphQL-16+-pink.svg)](https://graphql.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6+-green.svg)](https://mongodb.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com/) 
 
 A modern, full-stack **DevOps-based Inventory Management System** specifically designed for pharmacies. Built with enterprise-grade architecture featuring React frontend, Node.js GraphQL backend, MongoDB database, and complete DevOps pipeline with Docker and Kubernetes.
 
@@ -297,4 +297,5 @@ MIT License
 #   p h a r m a c y - i n v e n t o r y 
  
  
+
 
