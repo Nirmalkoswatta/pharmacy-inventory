@@ -294,7 +294,7 @@ The project uses GitHub Actions for automated builds and deployments. On every p
 ## License
 
 MIT License
-#   p h a r m a c y - i n v e n t o r y 
+#   p h a r m a c y - i n v e n t o r y .  
  
  
 
