@@ -27,7 +27,7 @@ A modern, full-stack **DevOps-based Inventory Management System** specifically d
 - **Interactive Cards**: Animated medicine cards with hover effects and status indicators
 - **Dark/Light Theme**: Customizable theme support
 - **Accessibility**: ARIA compliant with keyboard navigation
-
+  
 ### 🔒 Security & Best Practices
 
 - **Environment Variables**: All sensitive data externalized
@@ -297,5 +297,6 @@ MIT License
 #   p h a r m a c y - i n v e n t o r y .  
  
  
+
 
 
